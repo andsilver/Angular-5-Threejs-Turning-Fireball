@@ -59,7 +59,7 @@ export class ThreeComponent implements AfterViewInit {
         );
         this.camera.position.z = this.cameraZ;
 
-        var parameters = [
+        const line_parameters = [
             [ 4.0,   0xffffff, 0.25, 1 ],
             [ 4.5, 0xffffff, 0.38, 1 ],
             [ 5.0, 0xaaaaaa, 0.25, 2 ],
@@ -68,9 +68,16 @@ export class ThreeComponent implements AfterViewInit {
             [ 7.0, 0xffffff, 0.125, 1 ]
         ];
 
-        var geometry = this.createGeometry();
-        for(let i = 0; i < parameters.length; ++ i ) {
-            let p = parameters[ i ];
+        const circle_parameters = [
+            [ 1000, 200, 14 ],
+            [ 400, 180, 5 ],
+            [ 300, 150, 3 ],
+            [ 100, 40, 1 ]
+        ]
+
+        let geometry = this.createGeometry();
+        for(let i = 0; i < line_parameters.length; ++ i ) {
+            let p = line_parameters[ i ];
             let material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ], linewidth: p[ 3 ] } );
             let line = new THREE.LineSegments( geometry, material );
             line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
@@ -81,10 +88,8 @@ export class ThreeComponent implements AfterViewInit {
             this.scene.add( line );
         }
 
-        this.createCircle(1000, 200, 14, true);
-        this.createCircle(400, 180, 5, true);
-        this.createCircle(300, 150, 3, true);
-        this.createCircle(100, 40, 1, true);
+        for(let param of circle_parameters)
+            this.createCircle(param[0], param[1], param[2]);
 
         this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
         this.renderer.setPixelRatio(devicePixelRatio);
@@ -109,19 +114,19 @@ export class ThreeComponent implements AfterViewInit {
         this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
     }
 
-    public createCircle(n, radius, cn, rot = false){
-        var vector = new THREE.Vector3();
-      	var spherical = new THREE.Spherical();
+    public createCircle(n, radius, cn, rot = true){
+        let vector = new THREE.Vector3();
+      	let spherical = new THREE.Spherical();
       	for ( let i = 0; i < n; i ++ ) {
-      		var phi = Math.acos( -1 + ( 2 * i ) / n );
-      		var theta = Math.sqrt( n * Math.PI ) * phi;
-            var d = (i % 21) == 0 ? cn : cn/3;
-            var geo = new THREE.CircleGeometry( Math.random()%d*d, 100);
-            var color = i % 3 == 0 ? 0xd82D33 : i % 3 == 1 ? 0x626261 : 0xffffff;
-            var material = new THREE.MeshBasicMaterial( { color: color } );
-            var circle = new THREE.Mesh( geo, material );
+      		let phi = Math.acos( -1 + ( 2 * i ) / n );
+      		let theta = Math.sqrt( n * Math.PI ) * phi;
+            let d = (i % 21) == 0 ? cn : cn/3;
+            let geo = new THREE.CircleGeometry( Math.random()%d*d, 100);
+            let color = i % 3 == 0 ? 0xd82D33 : i % 3 == 1 ? 0x626261 : 0xffffff;
+            let material = new THREE.MeshBasicMaterial( { color: color } );
+            let circle = new THREE.Mesh( geo, material );
 
-            var object = new THREE.Object3D();
+            let object = new THREE.Object3D();
 
             spherical.set( radius, phi, theta );
             object.position.setFromSpherical( spherical );
@@ -137,7 +142,7 @@ export class ThreeComponent implements AfterViewInit {
     }
 
     public createGeometry() {
-        var geometry = new THREE.Geometry();
+        let geometry = new THREE.Geometry();
         for ( var i = 0; i < 1000; i ++ )
         {
         	var vertex1 = new THREE.Vector3();
@@ -146,7 +151,7 @@ export class ThreeComponent implements AfterViewInit {
         	vertex1.z = Math.random() * 2 - 1;
         	vertex1.normalize();
         	vertex1.multiplyScalar( r );
-        	var vertex2 = vertex1.clone();
+        	let vertex2 = vertex1.clone();
         	vertex2.multiplyScalar( Math.random() * 0.01 + 1 );
         	geometry.vertices.push( vertex1 );
         	geometry.vertices.push( vertex2 );
@@ -155,20 +160,19 @@ export class ThreeComponent implements AfterViewInit {
     }
 
     render() {
-        var rt = r * Math.cos( angle );
-
-        this.camera.position.x = ;
-        this.camera.position.y = r * Math.cos( angle );
+        this.camera.position.x = r * Math.cos( angle );
         this.camera.position.z = r * Math.sin( angle );
-        angle += 0.03;
+        angle += 0.02;
         this.camera.lookAt( this.scene.position );
         this.renderer.render( this.scene, this.camera );
-        var time = Date.now() * 0.0001;
-        for ( var i = 0; i < this.scene.children.length; i ++ ) {
+        let time = Date.now() * 0.0001;
+        for ( var i = 0; i < this.scene.children.length; i ++ )
+        {
         	var object = this.scene.children[ i ];
-        	if ( object instanceof THREE.Line ) {
-        		object.rotation.y = time * ( i < 4 ? ( i + 1 ) : - ( i + 1 ) ) ;
-        		if ( i < 5 ) object.scale.x = object.scale.y = object.scale.z = object['originalScale'] / 2 * (i/5+1) * (1 + 0.5 * Math.sin( 7*time ) );
+        	if ( object instanceof THREE.Line )
+            {
+        		object.rotation.x = object.rotation.y = object.rotation.z = time * (  - ( i + 1 ) ) ;
+        		object.scale.x = object.scale.y = - object['originalScale'] / 2 * (i/5+1) * (1 + 0.5 * Math.sin( 7*time ));
         	}
         }
 	}
