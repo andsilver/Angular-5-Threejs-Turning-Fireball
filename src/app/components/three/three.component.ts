@@ -152,14 +152,6 @@ export class ThreeComponent implements AfterViewInit {
         this.clock = new THREE.Clock();
 
         this.addObjectsToScene();
-        console.log(this.active);
-
-        var directionalLight = new THREE.DirectionalLight( 0xffffff );
-		directionalLight.position.x = 0;
-		directionalLight.position.y = 0;
-		directionalLight.position.z = 0;
-		directionalLight.position.normalize();
-		this.scene.add( directionalLight );
 
         this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
         this.renderer.setPixelRatio(devicePixelRatio);
